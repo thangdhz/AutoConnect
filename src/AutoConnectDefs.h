@@ -11,7 +11,7 @@
 #define _AUTOCONNECTDEFS_H_
 
 // Uncomment the following AC_DEBUG to enable debug output.
-//#define AC_DEBUG
+#define AC_DEBUG
 
 // Debug output destination can be defined externally with AC_DEBUG_PORT
 #ifndef AC_DEBUG_PORT
@@ -58,7 +58,7 @@
 // The AC_USE_SPIFFS and AC_USE_LITTLEFS macros declare which filesystem
 // to apply. Their definitions are contradictory to each other and you
 // cannot activate both at the same time.
-//#define AC_USE_SPIFFS
+#define AC_USE_SPIFFS
 //#define AC_USE_LITTLEFS
 // Each platform supported by AutoConnect has a default file system,
 // which is LittleFS for ESP8266 and SPIFFS for ESP32. Neither AC_USE_SPIFFS
@@ -197,7 +197,7 @@
 
 // Number of unit lines in the page that lists available SSIDs
 #ifndef AUTOCONNECT_SSIDPAGEUNIT_LINES
-#define AUTOCONNECT_SSIDPAGEUNIT_LINES  5
+#define AUTOCONNECT_SSIDPAGEUNIT_LINES  16
 #endif // !AUTOCONNECT_SSIDPAGEUNIT_LINES
 
 // SPI transfer speed for SD [Hz]

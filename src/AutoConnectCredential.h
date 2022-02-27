@@ -61,6 +61,8 @@ typedef struct {
   uint8_t ssid[32];
   uint8_t password[64];
   uint8_t bssid[6];
+  uint8_t zone[64];
+  uint8_t email[128];
   uint8_t dhcp;   /**< 0:DHCP, 1:Static IP */
   union _config {
     uint32_t  addr[5];
@@ -153,6 +155,8 @@ class AutoConnectCredential : public AutoConnectCredentialBase {
  private:
   typedef struct {
     String   password;
+    String   email;
+    String   zone;
     uint8_t  bssid[6];
     uint8_t  dhcp;   /**< 1:DHCP, 2:Static IP */
     uint32_t ip[5];

@@ -486,6 +486,9 @@ bool AutoConnectCredential::_add(const station_config_t* config) {
     // Insert
     AC_CREDTBODY_t  credtBody;
     credtBody.password = String(reinterpret_cast<const char*>(config->password));
+    credtBody.zone = String(reinterpret_cast<const char*>(config->zone));
+    credtBody.email = String(reinterpret_cast<const char*>(config->email));
+    AC_DBG("=>>  credential %s/%s - %s - %s\n", ssid.c_str(), credtBody.password.c_str(), credtBody.zone.c_str(), credtBody.email.c_str());
     memcpy(credtBody.bssid, config->bssid, sizeof(AC_CREDTBODY_t::bssid));
     credtBody.dhcp = config->dhcp;
     for (uint8_t e = 0; e < sizeof(AC_CREDTBODY_t::ip) / sizeof(uint32_t); e++)
@@ -514,11 +517,16 @@ size_t AutoConnectCredential::_commit(void) {
   for (const auto& credt : _credit) {
     ssid = credt.first;
     credtBody = credt.second;
-    sz += ssid.length() + sizeof('\0') + credtBody.password.length() + sizeof('\0') + sizeof(AC_CREDTBODY_t::bssid) + sizeof(AC_CREDTBODY_t::dhcp);
+    sz += ssid.length() + sizeof('\0') + 
+            credtBody.password.length() + sizeof('\0') + 
+            credtBody.zone.length() + sizeof('\0') + 
+            credtBody.email.length() + sizeof('\0') + 
+            sizeof(AC_CREDTBODY_t::bssid) + sizeof(AC_CREDTBODY_t::dhcp);
     if (credtBody.dhcp == (uint32_t)STA_STATIC) {
       for (uint8_t e = 0; e < sizeof(AC_CREDTBODY_t::ip) / sizeof(uint32_t); e++)
         sz += sizeof(uint32_t);
     }
+    AC_DBG("=>>> credential %s/%s - %s - %s\n", ssid.c_str(), credtBody.password.c_str(), credtBody.zone.c_str(), credtBody.email.c_str());
   }
   // When the entry is not empty, the size of container terminator as '\0' must be added.
   _containSize = sz + (_entries ? sizeof('\0') : 0);
@@ -543,6 +551,14 @@ size_t AutoConnectCredential::_commit(void) {
       dp += itemLen;
       itemLen = credtBody.password.length() + sizeof('\0');
       credtBody.password.toCharArray(reinterpret_cast<char*>(&credtPool[dp]), itemLen);
+      // Email
+      dp += itemLen;
+      itemLen = credtBody.email.length() + sizeof('\0');
+      credtBody.email.toCharArray(reinterpret_cast<char*>(&credtPool[dp]), itemLen);
+      // TimeZone
+      dp += itemLen;
+      itemLen = credtBody.zone.length() + sizeof('\0');
+      credtBody.zone.toCharArray(reinterpret_cast<char*>(&credtPool[dp]), itemLen);
       // BSSID
       dp += itemLen;
       memcpy(&credtPool[dp], credtBody.bssid, sizeof(station_config_t::bssid));
@@ -556,6 +572,8 @@ size_t AutoConnectCredential::_commit(void) {
             credtPool[dp++] = ((uint8_t*)&credtBody.ip[e])[sizeof(credtBody.ip[e]) - b];
         }
       }
+
+      AC_DBG("<<<= credential %s/%s - %s - %s\n", ssid.c_str(), credtBody.password.c_str(), credtBody.zone.c_str(), credtBody.email.c_str());
     }
     if (_credit.size() > 0)
       credtPool[dp] = '\0'; // Terminates a container
@@ -623,8 +641,14 @@ uint8_t AutoConnectCredential::_import(void) {
           // Password
           dp += ssid.length() + sizeof('\0');
           credtBody.password = String(reinterpret_cast<const char*>(&credtPool[dp]));
-          // BSSID
+          // Email
           dp += credtBody.password.length() + sizeof('\0');
+          credtBody.email = String(reinterpret_cast<const char*>(&credtPool[dp]));
+          // TimeZone
+          dp += credtBody.email.length() + sizeof('\0');
+          credtBody.zone = String(reinterpret_cast<const char*>(&credtPool[dp]));
+          // BSSID
+          dp += credtBody.zone.length() + sizeof('\0');
           memcpy(credtBody.bssid, &credtPool[dp], sizeof(AC_CREDTBODY_t::bssid));
           dp += sizeof(AC_CREDTBODY_t::bssid);
           // DHCP/Static IP indicator
@@ -674,6 +698,8 @@ void AutoConnectCredential::_obtain(AC_CREDT_t::iterator const& it, station_conf
   memset(config, 0x00, sizeof(station_config_t));
   ssid.toCharArray(reinterpret_cast<char*>(config->ssid), sizeof(station_config_t::ssid));
   credtBody.password.toCharArray(reinterpret_cast<char*>(config->password), sizeof(station_config_t::password));
+  credtBody.email.toCharArray(reinterpret_cast<char*>(config->email), sizeof(station_config_t::email));
+  credtBody.zone.toCharArray(reinterpret_cast<char*>(config->zone), sizeof(station_config_t::zone));
   memcpy(config->bssid, credtBody.bssid, sizeof(station_config_t::bssid));
   config->dhcp = credtBody.dhcp;
   for (uint8_t e = 0; e < sizeof(AC_CREDTBODY_t::ip) / sizeof(uint32_t); e++)

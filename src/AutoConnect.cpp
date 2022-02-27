@@ -135,7 +135,7 @@ bool AutoConnect::begin(const char* ssid, const char* passphrase, unsigned long 
     station_config_t  current;
     // Restore current STA configuration
     if (_getConfigSTA(&current))
-      AC_DBG("Current:%.32s\n", current.ssid);
+      AC_DBG("Current:%.32s:%s\n", current.ssid, current.password);
 
     // Prepare valid configuration according to the WiFi connection right order.
     cs = true;
@@ -1296,10 +1296,16 @@ String AutoConnect::_induceConnect(PageArgument& args) {
 #endif
   }
   else {
-    AC_DBG("Queried SSID:%s\n", args.arg(AUTOCONNECT_PARAMID_SSID).c_str());
+    AC_DBG("Queried SSID:%s, passwd:%s, email:%s, timezone %s\n",
+                                    args.arg(AUTOCONNECT_PARAMID_SSID).c_str(),
+                                    args.arg(AUTOCONNECT_PARAMID_PASS).c_str(),
+                                    args.arg(AUTOCONNECT_PARAMID_EMAIL).c_str(),
+                                    args.arg(AUTOCONNECT_PARAMID_TIMEZONE).c_str());
     // Credential had by the post parameter.
     strncpy(reinterpret_cast<char*>(_credential.ssid), args.arg(String(F(AUTOCONNECT_PARAMID_SSID))).c_str(), sizeof(_credential.ssid));
     strncpy(reinterpret_cast<char*>(_credential.password), args.arg(String(F(AUTOCONNECT_PARAMID_PASS))).c_str(), sizeof(_credential.password));
+    strncpy(reinterpret_cast<char*>(_credential.email), args.arg(String(F(AUTOCONNECT_PARAMID_EMAIL))).c_str(), sizeof(_credential.email));
+    strncpy(reinterpret_cast<char*>(_credential.zone), args.arg(String(F(AUTOCONNECT_PARAMID_TIMEZONE))).c_str(), sizeof(_credential.zone));
     memset(_credential.bssid, 0x00, sizeof(station_config_t::bssid));
     // Static IP detection
     if (args.hasArg(String(F(AUTOCONNECT_PARAMID_DHCP)))) {
