@@ -125,7 +125,7 @@
 
 // AutoConnect menu title
 #ifndef AUTOCONNECT_MENU_TITLE
-#define AUTOCONNECT_MENU_TITLE  "AutoConnect"
+#define AUTOCONNECT_MENU_TITLE  "Water Wasp"
 #endif // !AUTOCONNECT_MENU_TITLE
 
 // URIs of AutoConnect menu collection
@@ -197,7 +197,7 @@
 
 // Number of unit lines in the page that lists available SSIDs
 #ifndef AUTOCONNECT_SSIDPAGEUNIT_LINES
-#define AUTOCONNECT_SSIDPAGEUNIT_LINES  16
+#define AUTOCONNECT_SSIDPAGEUNIT_LINES  6
 #endif // !AUTOCONNECT_SSIDPAGEUNIT_LINES
 
 // SPI transfer speed for SD [Hz]
